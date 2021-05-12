@@ -1,0 +1,69 @@
+---
+version: '2'
+services:
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.8.1
+    container_name: kafdrop
+    depends_on:
+      - zookeeper
+      - kafka
+    expose:
+      - 9000
+    ports:
+      - 9000:9000
+    environment:
+      ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKERCONNECT: kafka:29092
+
+  rabbitmq:
+    image: rabbitmq:3.7-management
+    container_name: rabbitmq
+    expose:
+      - 5672
+      - 15672
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
+    # 他のマシン上のクライアントからKafkaへアクセスすることに関する重要な注意事項
+    # -----------------------------------------------------------------------
+    #
+    # ここで使われている設定は broker への _外部_ 接続に9092ポートを開放しています。
+    # つまり、dockerネットワークの _外側_ からのアクセスということです。
+    # _外側_ というのはdockerを実行しているホスト マシンからかもしれないですし、
+    # さらに複雑な設定をすれば、インターネットからのアクセスも可能になります。
+    # 後者（インターネットからのアクセス）がユースケースに該当する場合、
+    # KAFKA_ADVERTISED_LISTENERSの'localhost'を
+    # リモートクライアントからdockerホストが解決可能なIPアドレスやドメイン名に
+    # 変更する必要があります。
+    #
+    # dockerネットワーク _内部_ での、他のサービスやコンポーネントから接続する時は
+    # kafka:29092 を使ってください。
+    #
+    # 詳細については https://rmoff.net/2018/08/02/kafka-listeners-explained/ を参照してください。
+    # "`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-'"`-._,-
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
