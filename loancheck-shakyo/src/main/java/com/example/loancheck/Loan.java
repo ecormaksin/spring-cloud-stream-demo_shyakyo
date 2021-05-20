@@ -30,8 +30,10 @@ public class Loan {
 	}
 
 	public void setStatus(String status) {
-		if (status.equals(Statuses.APPROVED.name()) || status.equals(Statuses.DECLINED.name())
-				|| status.equals(Statuses.PENDING.name()) || status.equals(Statuses.REJECTED.name())) {
+		if (status.equals(Statuses.APPROVED.name())
+				|| status.equals(Statuses.DECLINED.name())
+				|| status.equals(Statuses.PENDING.name())
+				|| status.equals(Statuses.REJECTED.name())) {
 			this.status = status;
 		} else {
 			throw new IllegalArgumentException("Cannot set the LoanApplication's status to " + status);
@@ -44,13 +46,13 @@ public class Loan {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 		Loan that = (Loan) o;
-		return amount == that.amount && uuid.equals(that.uuid) && name.equals(that.name)
-				&& Objects.equals(status, that.status);
+		return amount == that.amount && 
+					uuid.equals(that.uuid) &&
+					name.equals(that.name) &&
+					Objects.equals(status, that.status);
 	}
 
 	@Override
@@ -60,7 +62,11 @@ public class Loan {
 
 	@Override
 	public String toString() {
-		return "Loan{" + "uuid='" + uuid + '\'' + ", name='" + name + '\'' + ", status='" + status + '\'' + ", amount="
-				+ amount + '}';
+		return "Loan{" + 
+				"uuid='" + uuid + '\'' + 
+				", name='" + name + '\'' + 
+				", status='" + status + '\'' + 
+				", amount=" + amount + 
+				'}';
 	}
 }
